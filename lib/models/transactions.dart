@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:intl/intl_browser.dart';
 
 class Transactions{
@@ -7,9 +8,9 @@ class Transactions{
   final int personId;
 
   //if isPaid == true then on display we will show '-'
-  final int isPaid;
+  final bool isPaid;
 
-  DateFormat dateFormat = DateFormat("yyyy-MM-dd HH:mm:ss");
+  static DateFormat dateFormat = DateFormat("yyyy-MM-dd HH:mm:ss");
 
   Transactions(this.details,this.amount,this.date,this.isPaid,this.personId);
 
@@ -20,7 +21,7 @@ class Transactions{
     map['amount'] = transcation.amount;
     map['date'] = dateFormat.format(transcation.date);
     map['is_paid'] = transcation.isPaid?1:0;
-    map['person_id'] = transcation.personId
+    map['person_id'] = transcation.personId;
 
     return map;
   }

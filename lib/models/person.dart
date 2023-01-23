@@ -6,7 +6,7 @@ class Person{
   final String number;
 
   //if isPaid == true then on display we will show '-'
-  final int isPaid;
+  final bool isPaid;
 
   Person(this.name,this.number,this.finalAmount,this.isPaid);
 
