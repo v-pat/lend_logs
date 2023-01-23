@@ -27,7 +27,7 @@ class _HomePageState extends State<HomePage> {
                     subtitle: Text(index.toString()+"000000000"),
                     trailing: Text("amount"),
                     onTap: () => {
-                      Navigator.of(context).push(new MaterialPageRoute(builder: (context) => new TransactionsPage())),
+                      Navigator.of(context).push(new MaterialPageRoute(builder: (context) => new TransactionsPage("Contact "+index.toString(),index.toString()+"000000000"))),
                     },
                   );
                 }
@@ -36,7 +36,15 @@ class _HomePageState extends State<HomePage> {
           ]
         )
       ,),
-      
+      floatingActionButton: FloatingActionButton(
+        child: Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
+        onPressed: () {
+          
+        }
+      )
     );
   }
 }

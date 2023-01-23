@@ -2,14 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 class TransactionsPage extends StatefulWidget {
+  final String contactName;
+  final String contactNumber;
+  TransactionsPage(this.contactName,this.contactNumber);
   @override
-  State<TransactionsPage> createState() => _TransactionsPageState();
+  State<TransactionsPage> createState() => _TransactionsPageState(this.contactName,this.contactNumber);
 }
 
 class _TransactionsPageState extends State<TransactionsPage> {
   final _formKey = GlobalKey<FormState>();
   var transactionTypes = ["Paid", "Recieved"];
   String _chosenValue = "123";
+  final String contactName;
+  final String contactNumber;
+  _TransactionsPageState(this.contactName,this.contactNumber);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,9 +25,9 @@ class _TransactionsPageState extends State<TransactionsPage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            "Contact Name",
+            this.contactName,
           ),
-          Text("Contact number", style: TextStyle(fontSize: 14.0)),
+          Text(this.contactNumber, style: TextStyle(fontSize: 14.0)),
         ],
       )),
       body: Padding(
@@ -69,7 +75,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
                     padding: EdgeInsets.all(1.0),
                     child: Form(
                       key: _formKey,
-                      child: Column(
+                      child: SingleChildScrollView(child:Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           TextFormField(
@@ -113,7 +119,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
                             ],
                           )
                         ],
-                      ),
+                      ),),
                     )),
               );
             },
