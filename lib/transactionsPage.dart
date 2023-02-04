@@ -72,9 +72,12 @@ class _TransactionsPageState extends State<TransactionsPage> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Container(
-                                  width: MediaQuery.of(context).size.width /3,
-                                child: Text(transactions[i].details,overflow: TextOverflow.ellipsis,)
-                                ),// Text(Transactions.dateFormat
+                                    width:
+                                        MediaQuery.of(context).size.width / 3,
+                                    child: Text(
+                                      transactions[i].details,
+                                      overflow: TextOverflow.ellipsis,
+                                    )), // Text(Transactions.dateFormat
                                 //     .format(transactions[i].date)),
                                 Text(
                                   transactions[i].isPaid
@@ -104,33 +107,36 @@ class _TransactionsPageState extends State<TransactionsPage> {
                                   builder: (context, setState) {
                                 return AlertDialog(
                                   title: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children:[
-                                        Expanded(
-                                          child: Text(
-                                            "Transaction details",
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16.0,
-                                            ),
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          "Transaction details",
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16.0,
                                           ),
                                         ),
-                                        IconButton(
-                                          onPressed: ()  {
-                                            DbHelper.db.deleteTransaction(transactions[i]);
-                                            setState(() {
-                                              getinitialData();
-                                            },);
+                                      ),
+                                      IconButton(
+                                          onPressed: () {
+                                            DbHelper.db.deleteTransaction(
+                                                transactions[i]);
+                                            setState(
+                                              () {
+                                                getinitialData();
+                                              },
+                                            );
                                             Navigator.pop(context);
                                           },
                                           icon: Icon(
                                             Icons.delete,
                                             color: Colors.red,
-                                          )
-                                        ),
-                                      ],
-                                    ),
+                                          )),
+                                    ],
+                                  ),
                                   content: Padding(
                                     padding: EdgeInsets.all(1.0),
                                     child: SingleChildScrollView(
@@ -175,7 +181,8 @@ class _TransactionsPageState extends State<TransactionsPage> {
                                               ),
                                               Text(
                                                 transactions[i].isPaid
-                                                    ? '- '+transactions[i].amount
+                                                    ? '- ' +
+                                                        transactions[i].amount
                                                     : '+ ' +
                                                         transactions[i].amount,
                                                 style: TextStyle(
@@ -195,13 +202,12 @@ class _TransactionsPageState extends State<TransactionsPage> {
                                                     fontWeight:
                                                         FontWeight.bold),
                                               ),
-                                              
                                             ],
                                           ),
                                           Row(
                                             children: [
                                               Expanded(
-                                                child:Text(
+                                                child: Text(
                                                   transactions[i].details,
                                                   style: TextStyle(
                                                     fontSize: 14.0,
@@ -252,12 +258,37 @@ class _TransactionsPageState extends State<TransactionsPage> {
                                 decoration: InputDecoration(
                                   label: Text("Brief Transaction Details"),
                                 ),
+                                validator: (value){
+                                  if(value!=null){
+                                    if(value.isEmpty){
+                                      return 'Please enter valid details';
+                                    }else if(value.length<5){
+                                      return 'Details should be of minimun 5 letters';
+                                    }
+                                  }else{
+                                    return 'Please enter valid details';
+                                  }
+                                },
                               ),
                               TextFormField(
+                                keyboardType: TextInputType.number,
                                 controller: amountController,
                                 decoration: InputDecoration(
                                   label: Text("Transaction Amount"),
                                 ),
+                                validator: (value) {
+                                  if(value!=null){
+                                    if (value.isEmpty) {
+                                      return 'Enter a valid amount';
+                                    }else if(value.length>6){
+                                      return 'Values upto 6 digits are allowed';
+                                    }else{
+                                      return null;
+                                    }
+                                  }else{
+                                    return 'Enter a valid amount';
+                                  }
+                                },
                               ),
                               Row(
                                 children: [
