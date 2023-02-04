@@ -4,6 +4,7 @@ class Person{
   final String name;
   final String finalAmount;
   final String number;
+  late int personId;
 
   //if isPaid == true then on display we will show '-'
   final bool isPaid;
@@ -29,6 +30,9 @@ class Person{
         map['is_paid']==0?false:true
     );
 
+if(map['id']>0){
+  person.personId =map['id'];
+}
     return person;
   }
 

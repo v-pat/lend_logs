@@ -3,6 +3,7 @@
 import 'dart:io';
 
 import 'package:lend_logs/models/person.dart';
+import 'package:lend_logs/models/transactions.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -38,10 +39,11 @@ class DbHelper{
     return _database!;
   }
 
+  String db_path ='';
   Future<Database> getDatabaseInstance() async {
     Directory directory = await getApplicationDocumentsDirectory();
-    String path = join(directory.path, "lend_logs.db");
-    return await openDatabase(path, version: 1,
+    db_path = join(directory.path, "lend_logs.db");
+    return await openDatabase(db_path, version: 1,
         onCreate: (Database db, int version) async {
       await db.execute('''create table $personTable(
         $personIdCol integer primary key autoincrement,
@@ -72,9 +74,27 @@ class DbHelper{
     return result;
   }
 
+  Future<void> deleteDatabase() =>
+    databaseFactory.deleteDatabase(db_path);
+
    Future<List<Person>> retrievePersons() async {
     final Database db = await database;
     final List<Map<String, Object?>> queryResult = await db.query(personTable);
     return queryResult.map((e) => Person.fromMap(e)).toList();
+  }
+
+  Future<List<Transactions>> retrieveTransactionsByPerson(int person_id) async {
+    final Database db = await database;
+    final List<Map<String, Object?>> queryResult = await db.rawQuery("SELECT * FROM "+transactionsTable+" WHERE " + "person_id" + " = " + person_id.toString(),null);
+    return queryResult.map((e) => Transactions.fromMap(e)).toList();
+  }
+
+  Future<int> insertTransaction(Transactions transactions) async {
+    int result = 0;
+    final Database db = await database;
+      result = await db.insert(transactionsTable, Transactions.toMap(transactions),
+          conflictAlgorithm: ConflictAlgorithm.replace);
+ 
+    return result;
   }
 }

@@ -13,23 +13,26 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   Database? db;
-  late List<Person> persons=[];
+  late List<Person> persons = [];
   late List tempPersons = [];
   late List<Person> tempPersons2;
   List<Contact> contacts = [];
   bool isLoading = false;
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   @override
-  initState(){
+  initState() {
     getPersons();
     super.initState();
   }
 
-  getPersons()async{
+  getPersons() async {
     persons = await DbHelper.db.retrievePersons();
     setState(() {
-      this.persons=persons;
+      this.persons = persons;
     });
   }
+
   void takeContacPermission() async {
     if (await Permission.contacts.isGranted) {
       contacts = await ContactsService.getContacts(withThumbnails: false);
@@ -44,6 +47,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        key: _scaffoldKey,
         appBar: AppBar(title: Text("Lend Logs")),
         body: Padding(
           padding: EdgeInsets.all(4.0),
@@ -57,18 +61,18 @@ class _HomePageState extends State<HomePage> {
                         title: Text(persons[i].name),
                         subtitle: Text(persons[i].number),
                         trailing: Text(
-                          (persons[i].isPaid
-                              ? '- '
-                              : '+ ' )+persons[i].finalAmount,
-                          style: TextStyle(
-                              color: persons[i].isPaid
-                                  ? Colors.red
-                                  : Colors.green,fontSize: 20)
-                        ),
+                            (persons[i].isPaid ? '- ' : '+ ') +
+                                persons[i].finalAmount,
+                            style: TextStyle(
+                                color: persons[i].isPaid
+                                    ? Colors.red
+                                    : Colors.green,
+                                fontSize: 20)),
                         onTap: () => {
+                          print(persons[i].personId),
                           Navigator.of(context).push(new MaterialPageRoute(
                               builder: (context) => new TransactionsPage(
-                                  persons[i].name, persons[i].number))),
+                                  persons[i].personId,persons[i].name, persons[i].number))),
                         },
                       );
                     }))
@@ -115,21 +119,33 @@ class _HomePageState extends State<HomePage> {
                                           .value!
                                           .toString()),
                                       onTap: () async {
-                                        DbHelper.db.inserTPersons(
-                                           Person(
-                                              contacts![i].displayName!,
-                                              contacts[i]
-                                                  .phones![0]
-                                                  .value!
-                                                  .toString(),
-                                              '0',
-                                              true,
-                                            )
+                                        var p = Person(
+                                          contacts![i].displayName!,
+                                          contacts[i]
+                                              .phones![0]
+                                              .value!
+                                              .toString(),
+                                          '0',
+                                          true,
                                         );
-                                        persons = await DbHelper.db.retrievePersons();
-                                        print(persons[0].isPaid);
+                                        if ((persons
+                                                .firstWhere(
+                                                    (el) =>
+                                                        el.number == p.number,
+                                                    orElse: () => Person(
+                                                        "", "", "", true))
+                                                .name ==
+                                            "")) {
+                                          DbHelper.db.inserTPersons(p);
+                                        } else {
+                                          var snackBar = SnackBar(content: Text('You already have history of transaction with this person'));
+                                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                        }
+
+                                        persons =
+                                            await DbHelper.db.retrievePersons();
                                         setState(() {
-                                          this.persons =persons;
+                                          this.persons = persons;
                                         });
                                       },
                                     );

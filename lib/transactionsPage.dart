@@ -1,21 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:lend_logs/dbHelper.dart';
+import 'package:lend_logs/models/transactions.dart';
 
 class TransactionsPage extends StatefulWidget {
   final String contactName;
+  final int personId;
   final String contactNumber;
-  TransactionsPage(this.contactName,this.contactNumber);
+  final int contactId = 122;
+  TransactionsPage(this.personId,this.contactName, this.contactNumber);
   @override
-  State<TransactionsPage> createState() => _TransactionsPageState(this.contactName,this.contactNumber);
+  State<TransactionsPage> createState() =>
+      _TransactionsPageState(this.personId,this.contactName, this.contactNumber);
 }
 
 class _TransactionsPageState extends State<TransactionsPage> {
   final _formKey = GlobalKey<FormState>();
   var transactionTypes = ["Paid", "Recieved"];
-  String _chosenValue = "123";
   final String contactName;
+  final int personId;
+  final int contactId = 122;
   final String contactNumber;
-  _TransactionsPageState(this.contactName,this.contactNumber);
+  late List<Transactions> transactions = [];
+  _TransactionsPageState(this.personId,this.contactName, this.contactNumber);
+
+  String selectedTransactionType = "";
+  @override
+  void initState() {
+    getinitialData();
+    super.initState();
+  }
+
+  getinitialData() async {
+    transactions =
+        await DbHelper.db.retrieveTransactionsByPerson(this.personId);
+    setState(() {
+      this.transactions = transactions;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,8 +61,8 @@ class _TransactionsPageState extends State<TransactionsPage> {
                 child: ListView.builder(
                     scrollDirection: Axis.vertical,
                     shrinkWrap: true,
-                    itemCount: 10,
-                    itemBuilder: (BuildContext context, int index) {
+                    itemCount: transactions.length,
+                    itemBuilder: (BuildContext context, int i) {
                       return Card(
                         child: Container(
                           height: MediaQuery.of(context).size.height * (0.07),
@@ -47,11 +70,25 @@ class _TransactionsPageState extends State<TransactionsPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Text("details"),
-                              Text("date"),
-                              Text("+-amount"),
+                              Text(transactions[i].details),
+                              Text(Transactions.dateFormat
+                                  .format(transactions[i].date)),
+                              Text(
+                                transactions[i].isPaid
+                                    ? '- '
+                                    : '+ ' + transactions[i].amount,
+                                style: TextStyle(
+                                    color: transactions[i].isPaid
+                                        ? Colors.red
+                                        : Colors.green,
+                                    fontSize: 14),
+                              ),
                               IconButton(
-                                  onPressed: () => {}, icon: Icon(Icons.delete))
+                                  onPressed: () => {},
+                                  icon: Icon(
+                                    Icons.delete,
+                                    color: Colors.red,
+                                  ))
                             ],
                           ),
                         ),
@@ -69,61 +106,100 @@ class _TransactionsPageState extends State<TransactionsPage> {
           showDialog(
             context: context,
             builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text("Add transaction"),
-                content: Padding(
-                    padding: EdgeInsets.all(1.0),
-                    child: Form(
-                      key: _formKey,
-                      child: SingleChildScrollView(child:Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          TextFormField(
-                            decoration: InputDecoration(
-                              label: Text("Brief Transaction Details"),
-                            ),
-                          ),
-                          TextFormField(
-                            decoration: InputDecoration(
-                              label: Text("Transaction Amount"),
-                            ),
-                          ),
-                          Row(
+              bool isPaidvalue = false;
+              final detailsController = TextEditingController();
+              final amountController = TextEditingController();
+              return StatefulBuilder(builder: (context, setState) {
+                return AlertDialog(
+                  title: Text("Add transaction"),
+                  content: Padding(
+                      padding: EdgeInsets.all(1.0),
+                      child: Form(
+                        key: _formKey,
+                        child: SingleChildScrollView(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              Radio(
-                                  value: transactionTypes[0],
-                                  groupValue: transactionTypes,
-                                  onChanged: (value) {}),
-                              Text('Paid', style: TextStyle(fontSize: 12.0)),
-                              Radio(
-                                  value: transactionTypes[1],
-                                  groupValue: transactionTypes,
-                                  onChanged: (value) {}),
-                              Text('Recieved',
-                                  style: TextStyle(fontSize: 12.0)),
+                              TextFormField(
+                                controller: detailsController,
+                                decoration: InputDecoration(
+                                  label: Text("Brief Transaction Details"),
+                                ),
+                              ),
+                              TextFormField(
+                                controller: amountController,
+                                decoration: InputDecoration(
+                                  label: Text("Transaction Amount"),
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  Checkbox(
+                                      value: isPaidvalue,
+                                      onChanged: (value) {
+                                        if (value != null) {
+                                          setState(() {
+                                            isPaidvalue = value;
+                                          });
+                                        }
+                                      }),
+                                  Text('Paid',
+                                      style: TextStyle(fontSize: 12.0)),
+                                  Checkbox(
+                                      value: !isPaidvalue,
+                                      onChanged: (value) {
+                                        if (value != null) {
+                                          setState(() {
+                                            isPaidvalue = !value;
+                                          });
+                                        }
+                                      }),
+                                  Text('Recieved',
+                                      style: TextStyle(fontSize: 12.0)),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  ElevatedButton(
+                                      style: ButtonStyle(
+                                          backgroundColor:
+                                              MaterialStateProperty.all(
+                                                  Colors.white)),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text("cancel",
+                                          style:
+                                              TextStyle(color: Colors.black))),
+                                  SizedBox(
+                                    width: 4.0,
+                                  ),
+                                  ElevatedButton(
+                                      onPressed: () {
+                                        var t = new Transactions(
+                                          detailsController.text, 
+                                          amountController.text, 
+                                          new DateTime.now(), 
+                                          isPaidvalue, 
+                                          this.personId,
+                                        );
+                                        DbHelper.db.insertTransaction(t);
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text("Add")),
+                                ],
+                              )
                             ],
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              ElevatedButton(
-                                style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.white)),
-                                onPressed: (){Navigator.pop(context);}, 
-                                child: Text("cancel",style:TextStyle(color: Colors.black))
-                              ),
-                              SizedBox(width: 4.0,),
-                              ElevatedButton(
-                                onPressed: (){}, 
-                                child: Text("Add")
-                              ),
-                            ],
-                          )
-                        ],
-                      ),),
-                    )),
-              );
+                        ),
+                      )),
+                );
+              });
             },
-          );
+          ).then((value) => {
+            this.getinitialData()
+          });
         },
       ),
     );
