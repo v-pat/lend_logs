@@ -31,6 +31,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       this.persons = persons;
     });
+    takeContacPermission();
   }
 
   void takeContacPermission() async {
