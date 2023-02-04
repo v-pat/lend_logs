@@ -8,10 +8,10 @@ class TransactionsPage extends StatefulWidget {
   final int personId;
   final String contactNumber;
   final int contactId = 122;
-  TransactionsPage(this.personId,this.contactName, this.contactNumber);
+  TransactionsPage(this.personId, this.contactName, this.contactNumber);
   @override
-  State<TransactionsPage> createState() =>
-      _TransactionsPageState(this.personId,this.contactName, this.contactNumber);
+  State<TransactionsPage> createState() => _TransactionsPageState(
+      this.personId, this.contactName, this.contactNumber);
 }
 
 class _TransactionsPageState extends State<TransactionsPage> {
@@ -22,7 +22,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
   final int contactId = 122;
   final String contactNumber;
   late List<Transactions> transactions = [];
-  _TransactionsPageState(this.personId,this.contactName, this.contactNumber);
+  _TransactionsPageState(this.personId, this.contactName, this.contactNumber);
 
   String selectedTransactionType = "";
   @override
@@ -63,35 +63,162 @@ class _TransactionsPageState extends State<TransactionsPage> {
                     shrinkWrap: true,
                     itemCount: transactions.length,
                     itemBuilder: (BuildContext context, int i) {
-                      return Card(
-                        child: Container(
-                          height: MediaQuery.of(context).size.height * (0.07),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(transactions[i].details),
-                              Text(Transactions.dateFormat
-                                  .format(transactions[i].date)),
-                              Text(
-                                transactions[i].isPaid
-                                    ? '- '
-                                    : '+ ' + transactions[i].amount,
-                                style: TextStyle(
-                                    color: transactions[i].isPaid
-                                        ? Colors.red
-                                        : Colors.green,
-                                    fontSize: 14),
-                              ),
-                              IconButton(
-                                  onPressed: () => {},
-                                  icon: Icon(
-                                    Icons.delete,
-                                    color: Colors.red,
-                                  ))
-                            ],
+                      return GestureDetector(
+                        child: Card(
+                          child: Container(
+                            height: MediaQuery.of(context).size.height * (0.07),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width: MediaQuery.of(context).size.width /3,
+                                child: Text(transactions[i].details,overflow: TextOverflow.ellipsis,)
+                                ),// Text(Transactions.dateFormat
+                                //     .format(transactions[i].date)),
+                                Text(
+                                  transactions[i].isPaid
+                                      ? '- ' + transactions[i].amount
+                                      : '+ ' + transactions[i].amount,
+                                  style: TextStyle(
+                                      color: transactions[i].isPaid
+                                          ? Colors.red
+                                          : Colors.green,
+                                      fontSize: 14),
+                                ),
+                                // IconButton(
+                                //     onPressed: () => {},
+                                //     icon: Icon(
+                                //       Icons.delete,
+                                //       color: Colors.red,
+                                //     ))
+                              ],
+                            ),
                           ),
                         ),
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return StatefulBuilder(
+                                  builder: (context, setState) {
+                                return AlertDialog(
+                                  title: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children:[
+                                        Expanded(
+                                          child: Text(
+                                            "Transaction details",
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16.0,
+                                            ),
+                                          ),
+                                        ),
+                                        IconButton(
+                                          onPressed: ()  {
+                                            DbHelper.db.deleteTransaction(transactions[i]);
+                                            setState(() {
+                                              getinitialData();
+                                            },);
+                                            Navigator.pop(context);
+                                          },
+                                          icon: Icon(
+                                            Icons.delete,
+                                            color: Colors.red,
+                                          )
+                                        ),
+                                      ],
+                                    ),
+                                  content: Padding(
+                                    padding: EdgeInsets.all(1.0),
+                                    child: SingleChildScrollView(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                "Date :",
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              Text(
+                                                Transactions.dateFormat.format(
+                                                    transactions[i].date),
+                                                style: TextStyle(
+                                                  fontSize: 14.0,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                "Amount :",
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              Text(
+                                                transactions[i].isPaid
+                                                    ? '- '+transactions[i].amount
+                                                    : '+ ' +
+                                                        transactions[i].amount,
+                                                style: TextStyle(
+                                                    color:
+                                                        transactions[i].isPaid
+                                                            ? Colors.red
+                                                            : Colors.green,
+                                                    fontSize: 14),
+                                              ),
+                                            ],
+                                          ),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                "Details :",
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              
+                                            ],
+                                          ),
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child:Text(
+                                                  transactions[i].details,
+                                                  style: TextStyle(
+                                                    fontSize: 14.0,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              });
+                            },
+                          );
+                        },
                       );
                     }),
               ),
@@ -178,10 +305,10 @@ class _TransactionsPageState extends State<TransactionsPage> {
                                   ElevatedButton(
                                       onPressed: () {
                                         var t = new Transactions(
-                                          detailsController.text, 
-                                          amountController.text, 
-                                          new DateTime.now(), 
-                                          isPaidvalue, 
+                                          detailsController.text,
+                                          amountController.text,
+                                          new DateTime.now(),
+                                          isPaidvalue,
                                           this.personId,
                                         );
                                         DbHelper.db.insertTransaction(t);
@@ -197,9 +324,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
                 );
               });
             },
-          ).then((value) => {
-            this.getinitialData()
-          });
+          ).then((value) => {this.getinitialData()});
         },
       ),
     );

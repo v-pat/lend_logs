@@ -97,4 +97,11 @@ class DbHelper{
  
     return result;
   }
+
+  Future<int> deleteTransaction(Transactions transactions) async {
+    int result = 0;
+    final Database db = await database;
+      result = await db.delete(transactionsTable, where:'date = ?',whereArgs: [Transactions.dateFormat.format(transactions.date)]);
+    return result;
+  }
 }
