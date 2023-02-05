@@ -29,7 +29,7 @@ class _HomePageState extends State<HomePage> {
 
   getPersons() async {
     persons = await DbHelper.db.retrievePersons();
-    
+
     setState(() {
       this.persons = persons;
     });
@@ -53,7 +53,8 @@ class _HomePageState extends State<HomePage> {
         key: _scaffoldKey,
         appBar: AppBar(
           leading: Image.asset('assets/images/logo_appbar.png'),
-          title: Text("Pay Logs")),
+          title: Text("Pay Logs"),
+        ),
         body: Padding(
           padding: EdgeInsets.all(4.0),
           child: Column(children: [
@@ -74,7 +75,9 @@ class _HomePageState extends State<HomePage> {
                         onTap: () => {
                           Navigator.of(context).push(new MaterialPageRoute(
                               builder: (context) => new TransactionsPage(
-                                  persons[i].personId,persons[i].name, persons[i].number))),
+                                  persons[i].personId,
+                                  persons[i].name,
+                                  persons[i].number))),
                         },
                       );
                     }))
@@ -141,8 +144,11 @@ class _HomePageState extends State<HomePage> {
                                             "")) {
                                           DbHelper.db.inserTPersons(p);
                                         } else {
-                                          var snackBar = SnackBar(content: Text('You already have history of transaction with this person'));
-                                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                          var snackBar = SnackBar(
+                                              content: Text(
+                                                  'You already have history of transaction with this person'));
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(snackBar);
                                         }
 
                                         persons =
