@@ -3,6 +3,7 @@ import 'package:flutter/rendering.dart';
 import 'package:lend_logs/dbHelper.dart';
 import 'package:lend_logs/homePage.dart';
 import 'package:lend_logs/models/transactions.dart';
+import 'package:lend_logs/utils.dart';
 
 class TransactionsPage extends StatefulWidget {
   final String contactName;
@@ -234,6 +235,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
             ],
           )),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Utils.colortheme,
         child: Icon(
           Icons.add,
           color: Colors.white,
@@ -261,12 +263,15 @@ class _TransactionsPageState extends State<TransactionsPage> {
                                 decoration: InputDecoration(
                                   label: Text("Brief Transaction Details"),
                                 ),
+                                maxLength: 150,
                                 validator: (value) {
                                   if (value != null) {
                                     if (value.isEmpty) {
                                       return 'Please enter valid details';
                                     } else if (value.length < 5) {
                                       return 'minimun 5 letters required';
+                                    }else if (value.length>150){
+                                      return 'maximum 150 letters allowed';
                                     }
                                   } else {
                                     return 'Please enter valid details';

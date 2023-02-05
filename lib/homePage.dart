@@ -3,6 +3,7 @@ import 'package:lend_logs/dbHelper.dart';
 import 'package:lend_logs/models/person.dart';
 import 'package:lend_logs/transactionsPage.dart';
 import 'package:contacts_service/contacts_service.dart';
+import 'package:lend_logs/utils.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -50,7 +51,9 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         key: _scaffoldKey,
-        appBar: AppBar(title: Text("Lend Logs")),
+        appBar: AppBar(
+          leading: Image.asset('assets/images/logo_appbar.png'),
+          title: Text("Pay Logs")),
         body: Padding(
           padding: EdgeInsets.all(4.0),
           child: Column(children: [
@@ -78,6 +81,7 @@ class _HomePageState extends State<HomePage> {
           ]),
         ),
         floatingActionButton: FloatingActionButton(
+            backgroundColor: Utils.colortheme,
             child: Icon(
               Icons.add,
               color: Colors.white,
