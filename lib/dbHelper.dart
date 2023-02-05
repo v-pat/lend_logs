@@ -89,19 +89,58 @@ class DbHelper{
     return queryResult.map((e) => Transactions.fromMap(e)).toList();
   }
 
+  Future<List<Person>> retrievePersonById(int person_id) async {
+    final Database db = await database;
+    final List<Map<String, Object?>> queryResult = await db.rawQuery("SELECT * FROM "+personTable+" WHERE " + "id" + " = " + person_id.toString(),null);
+    return queryResult.map((e) => Person.fromMap(e)).toList();
+  }
+
   Future<int> insertTransaction(Transactions transactions) async {
     int result = 0;
     final Database db = await database;
       result = await db.insert(transactionsTable, Transactions.toMap(transactions),
           conflictAlgorithm: ConflictAlgorithm.replace);
- 
+
+    List<Person> p=[];
+    int updateResult=0;
+    if(result!=0){
+      p = await retrievePersonById(transactions.personId);
+      if(p.length>0){
+        var val = (int.parse(p[0].finalAmount)+int.parse(transactions.amount)).toString();
+          
+          updateResult = await db.rawUpdate('''
+            UPDATE $personTable 
+            SET $personFinalAmountCol = ?
+            WHERE $personIdCol = ?
+            ''', 
+            [val,transactions.personId]
+          );
+      }
+    }
     return result;
   }
 
   Future<int> deleteTransaction(Transactions transactions) async {
     int result = 0;
+    int updateResult = 0;
     final Database db = await database;
       result = await db.delete(transactionsTable, where:'date = ?',whereArgs: [Transactions.dateFormat.format(transactions.date)]);
+    List<Person> p=[];
+    if(result!=0){
+     p = await retrievePersonById(transactions.personId);
+      if(p.length>0){
+        var val = (int.parse(p[0].finalAmount)-int.parse(transactions.amount)).toString();
+          
+          updateResult = await db.rawUpdate('''
+            UPDATE $personTable 
+            SET $personFinalAmountCol = ?
+            WHERE $personIdCol = ?
+            ''', 
+            [val,transactions.personId]
+          );
+      }
+    }
     return result;
+
   }
 }

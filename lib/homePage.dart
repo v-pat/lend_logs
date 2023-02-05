@@ -28,6 +28,7 @@ class _HomePageState extends State<HomePage> {
 
   getPersons() async {
     persons = await DbHelper.db.retrievePersons();
+    
     setState(() {
       this.persons = persons;
     });
@@ -61,16 +62,13 @@ class _HomePageState extends State<HomePage> {
                       return ListTile(
                         title: Text(persons[i].name),
                         subtitle: Text(persons[i].number),
-                        trailing: Text(
-                            (persons[i].isPaid ? '- ' : '+ ') +
-                                persons[i].finalAmount,
+                        trailing: Text(persons[i].finalAmount,
                             style: TextStyle(
-                                color: persons[i].isPaid
+                                color: persons[i].finalAmount.contains('-')
                                     ? Colors.red
                                     : Colors.green,
                                 fontSize: 20)),
                         onTap: () => {
-                          print(persons[i].personId),
                           Navigator.of(context).push(new MaterialPageRoute(
                               builder: (context) => new TransactionsPage(
                                   persons[i].personId,persons[i].name, persons[i].number))),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:lend_logs/dbHelper.dart';
+import 'package:lend_logs/homePage.dart';
 import 'package:lend_logs/models/transactions.dart';
 
 class TransactionsPage extends StatefulWidget {
@@ -43,16 +44,22 @@ class _TransactionsPageState extends State<TransactionsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+          leading: IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.of(context).push(new MaterialPageRoute(
+                    builder: ((context) => new HomePage())));
+              }),
           title: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            this.contactName,
-          ),
-          Text(this.contactNumber, style: TextStyle(fontSize: 14.0)),
-        ],
-      )),
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                this.contactName,
+              ),
+              Text(this.contactNumber, style: TextStyle(fontSize: 14.0)),
+            ],
+          )),
       body: Padding(
           padding: EdgeInsets.all(4.0),
           child: Column(
@@ -80,13 +87,12 @@ class _TransactionsPageState extends State<TransactionsPage> {
                                     )), // Text(Transactions.dateFormat
                                 //     .format(transactions[i].date)),
                                 Text(
-                                  transactions[i].isPaid
-                                      ? '- ' + transactions[i].amount
-                                      : '+ ' + transactions[i].amount,
+                                  transactions[i].amount,
                                   style: TextStyle(
-                                      color: transactions[i].isPaid
-                                          ? Colors.red
-                                          : Colors.green,
+                                      color:
+                                          transactions[i].amount.contains('-')
+                                              ? Colors.red
+                                              : Colors.green,
                                       fontSize: 14),
                                 ),
                                 // IconButton(
@@ -180,16 +186,13 @@ class _TransactionsPageState extends State<TransactionsPage> {
                                                         FontWeight.bold),
                                               ),
                                               Text(
-                                                transactions[i].isPaid
-                                                    ? '- ' +
-                                                        transactions[i].amount
-                                                    : '+ ' +
-                                                        transactions[i].amount,
+                                                transactions[i].amount,
                                                 style: TextStyle(
-                                                    color:
-                                                        transactions[i].isPaid
-                                                            ? Colors.red
-                                                            : Colors.green,
+                                                    color: transactions[i]
+                                                            .amount
+                                                            .contains('-')
+                                                        ? Colors.red
+                                                        : Colors.green,
                                                     fontSize: 14),
                                               ),
                                             ],
@@ -258,14 +261,14 @@ class _TransactionsPageState extends State<TransactionsPage> {
                                 decoration: InputDecoration(
                                   label: Text("Brief Transaction Details"),
                                 ),
-                                validator: (value){
-                                  if(value!=null){
-                                    if(value.isEmpty){
+                                validator: (value) {
+                                  if (value != null) {
+                                    if (value.isEmpty) {
                                       return 'Please enter valid details';
-                                    }else if(value.length<5){
-                                      return 'Details should be of minimun 5 letters';
+                                    } else if (value.length < 5) {
+                                      return 'minimun 5 letters required';
                                     }
-                                  }else{
+                                  } else {
                                     return 'Please enter valid details';
                                   }
                                 },
@@ -277,15 +280,15 @@ class _TransactionsPageState extends State<TransactionsPage> {
                                   label: Text("Transaction Amount"),
                                 ),
                                 validator: (value) {
-                                  if(value!=null){
+                                  if (value != null) {
                                     if (value.isEmpty) {
                                       return 'Enter a valid amount';
-                                    }else if(value.length>6){
-                                      return 'Values upto 6 digits are allowed';
-                                    }else{
+                                    } else if (value.length > 6) {
+                                      return 'upto 6 digits are allowed';
+                                    } else {
                                       return null;
                                     }
-                                  }else{
+                                  } else {
                                     return 'Enter a valid amount';
                                   }
                                 },
@@ -335,15 +338,24 @@ class _TransactionsPageState extends State<TransactionsPage> {
                                   ),
                                   ElevatedButton(
                                       onPressed: () {
-                                        var t = new Transactions(
-                                          detailsController.text,
-                                          amountController.text,
-                                          new DateTime.now(),
-                                          isPaidvalue,
-                                          this.personId,
-                                        );
-                                        DbHelper.db.insertTransaction(t);
-                                        Navigator.pop(context);
+                                        if (_formKey.currentState!.validate()) {
+                                          var amt = isPaidvalue
+                                              ? '-' +
+                                                  amountController.text
+                                                      .toString()
+                                              : '+' +
+                                                  amountController.text
+                                                      .toString();
+                                          var t = new Transactions(
+                                            detailsController.text,
+                                            amt,
+                                            new DateTime.now(),
+                                            // isPaidvalue,
+                                            this.personId,
+                                          );
+                                          DbHelper.db.insertTransaction(t);
+                                          Navigator.pop(context);
+                                        }
                                       },
                                       child: Text("Add")),
                                 ],

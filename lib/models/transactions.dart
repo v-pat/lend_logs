@@ -7,11 +7,13 @@ class Transactions{
   final int personId;
 
   //if isPaid == true then on display we will show '-'
-  final bool isPaid;
+  // final bool isPaid;
 
   static DateFormat dateFormat = DateFormat("yyyy-MM-dd HH:mm:ss");
 
-  Transactions(this.details,this.amount,this.date,this.isPaid,this.personId);
+  Transactions(this.details,this.amount,this.date,
+  // this.isPaid,
+  this.personId);
 
   static Map<String,dynamic> toMap(Transactions transcation){
     var map = new Map<String,dynamic>();
@@ -19,7 +21,7 @@ class Transactions{
     map['details'] = transcation.details;
     map['amount'] = transcation.amount;
     map['date'] = dateFormat.format(transcation.date);
-    map['is_paid'] = transcation.isPaid?1:0;
+    // map['is_paid'] = transcation.isPaid?1:0;
     map['person_id'] = transcation.personId;
 
     return map;
@@ -30,7 +32,7 @@ class Transactions{
       map['details'],
         map['amount'],
        dateFormat.parse(map['date']),
-        map['is_paid']==0?false:true,
+        // map['is_paid']==0?false:true,
         map['person_id']
     );
 
