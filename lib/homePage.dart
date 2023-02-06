@@ -39,6 +39,15 @@ class _HomePageState extends State<HomePage> {
   void takeContacPermission() async {
     if (await Permission.contacts.isGranted) {
       contacts = await ContactsService.getContacts(withThumbnails: false);
+      List<Contact> tempContacts = contacts;
+      contacts = [];
+      tempContacts.forEach((element) {
+        if (!(element.phones!.length < 1 ||
+            element.phones![0].value == null ||
+            element.displayName == '')) {
+          contacts.add(element);
+        }
+      });
       setState(() {
         this.isLoading = false;
       });
@@ -79,6 +88,34 @@ class _HomePageState extends State<HomePage> {
                                   persons[i].name,
                                   persons[i].number))),
                         },
+                        onLongPress: () {
+                          showDialog(
+                              context: context,
+                              builder: ((context) {
+                                return AlertDialog(
+                                  title: Text(
+                                      "Are You sure you want to delete all transaction logs with this person ?"),
+                                  icon: Icon(Icons.delete),
+                                  iconColor: Colors.red,
+                                  actions: [
+                                    ElevatedButton(
+                                      onPressed: (){Navigator.pop(context);}, 
+                                      child: Text("Cancel",style: TextStyle(color: Colors.black),),
+                                       style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.white)),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        DbHelper.db.deletePerson(persons[i]);
+                                        getPersons();
+                                        Navigator.pop(context);
+                                      }, 
+                                      child: Text('Yes'),
+                                     
+                                    ),
+                                  ],
+                                );
+                              }));
+                        },
                       );
                     }))
           ]),
@@ -113,52 +150,54 @@ class _HomePageState extends State<HomePage> {
                                   label: Text("Search contact"),
                                 ),
                               ),
-                              ListView.builder(
-                                  scrollDirection: Axis.vertical,
-                                  shrinkWrap: true,
-                                  itemCount: contacts.length,
-                                  itemBuilder: (BuildContext context, int i) {
-                                    return ListTile(
-                                      title: Text(contacts![i].displayName!),
-                                      subtitle: Text(contacts[i]
-                                          .phones![0]
-                                          .value!
-                                          .toString()),
-                                      onTap: () async {
-                                        var p = Person(
-                                          contacts![i].displayName!,
-                                          contacts[i]
-                                              .phones![0]
-                                              .value!
-                                              .toString(),
-                                          '0',
-                                          true,
-                                        );
-                                        if ((persons
-                                                .firstWhere(
-                                                    (el) =>
-                                                        el.number == p.number,
-                                                    orElse: () => Person(
-                                                        "", "", "", true))
-                                                .name ==
-                                            "")) {
-                                          DbHelper.db.inserTPersons(p);
-                                        } else {
-                                          var snackBar = SnackBar(
-                                              content: Text(
-                                                  'You already have history of transaction with this person'));
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(snackBar);
-                                        }
+                              SingleChildScrollView(
+                                child: ListView.builder(
+                                    scrollDirection: Axis.vertical,
+                                    shrinkWrap: true,
+                                    itemCount: contacts.length,
+                                    itemBuilder: (BuildContext context, int i) {
+                                      return ListTile(
+                                        title: Text(contacts![i].displayName!),
+                                        subtitle: Text(contacts[i]
+                                            .phones![0]
+                                            .value!
+                                            .toString()),
+                                        onTap: () async {
+                                          var p = Person(
+                                            contacts![i].displayName!,
+                                            contacts[i]
+                                                .phones![0]
+                                                .value!
+                                                .toString(),
+                                            '0',
+                                            true,
+                                          );
+                                          if ((persons
+                                                  .firstWhere(
+                                                      (el) =>
+                                                          el.number == p.number,
+                                                      orElse: () => Person(
+                                                          "", "", "", true))
+                                                  .name ==
+                                              "")) {
+                                            DbHelper.db.inserTPersons(p);
+                                          } else {
+                                            var snackBar = SnackBar(
+                                                content: Text(
+                                                    'You already have history of transaction with this person'));
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(snackBar);
+                                          }
 
-                                        persons =
-                                            await DbHelper.db.retrievePersons();
-                                        setState(() {
-                                          this.persons = persons;
-                                        });
-                                      },
-                                    );
-                                  }),
+                                          persons = await DbHelper.db
+                                              .retrievePersons();
+                                          setState(() {
+                                            this.persons = persons;
+                                          });
+                                        },
+                                      );
+                                    }),
+                              )
                             ]))));
                   });
             }));

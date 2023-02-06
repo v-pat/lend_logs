@@ -143,4 +143,15 @@ class DbHelper{
     return result;
 
   }
+  Future<int> deletePerson(Person p) async {
+    int result = 0;
+    int updateResult = 0;
+    final Database db = await database;
+      result = await db.delete(personTable, where:'id = ?',whereArgs: [p.personId]);
+    
+    updateResult = await db.rawDelete(
+      'DELETE FROM $transactionsTable WHERE $transactionsPersonIdCol = ?', [p.personId]
+    );
+    return result;
+  }
 }
