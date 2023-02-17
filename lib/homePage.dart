@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:lend_logs/dbHelper.dart';
 import 'package:lend_logs/models/person.dart';
 import 'package:lend_logs/transactionsPage.dart';
@@ -19,6 +20,7 @@ class _HomePageState extends State<HomePage> {
   late List<Person> tempPersons2;
   List<Contact> contacts = [];
   bool isLoading = false;
+  TextEditingController searchContactController = TextEditingController();
 
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   @override
@@ -38,6 +40,7 @@ class _HomePageState extends State<HomePage> {
 
   void takeContacPermission() async {
     if (await Permission.contacts.isGranted) {
+      searchContactController.clear();
       contacts = await ContactsService.getContacts(withThumbnails: false);
       List<Contact> tempContacts = contacts;
       contacts = [];
@@ -99,18 +102,25 @@ class _HomePageState extends State<HomePage> {
                                   iconColor: Colors.red,
                                   actions: [
                                     ElevatedButton(
-                                      onPressed: (){Navigator.pop(context);}, 
-                                      child: Text("Cancel",style: TextStyle(color: Colors.black),),
-                                       style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.white)),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text(
+                                        "Cancel",
+                                        style: TextStyle(color: Colors.black),
+                                      ),
+                                      style: ButtonStyle(
+                                          backgroundColor:
+                                              MaterialStateProperty.all(
+                                                  Colors.white)),
                                     ),
                                     ElevatedButton(
                                       onPressed: () {
                                         DbHelper.db.deletePerson(persons[i]);
                                         getPersons();
                                         Navigator.pop(context);
-                                      }, 
+                                      },
                                       child: Text('Yes'),
-                                     
                                     ),
                                   ],
                                 );
@@ -131,74 +141,100 @@ class _HomePageState extends State<HomePage> {
                 this.isLoading = true;
               });
               this.takeContacPermission();
+              List<Contact> _contacts = contacts;
+              bool iskeyboardopen =false;
               showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return AlertDialog(
-                        title: Text(
-                          "Start Transaction Log",
-                          style: TextStyle(
-                            fontSize: 16.0,
+                    return StatefulBuilder(builder: (context, setState) {
+                      return AlertDialog(
+                          scrollable: true,
+                          title: Text(
+                            "Start Transaction Log",
+                            style: TextStyle(
+                              fontSize: 16.0,
+                            ),
                           ),
-                        ),
-                        content: Padding(
-                            padding: EdgeInsets.all(1.0),
-                            child: SingleChildScrollView(
-                                child: Column(children: [
-                              TextFormField(
-                                decoration: InputDecoration(
-                                  label: Text("Search contact"),
+                          content: Padding(
+                              padding: EdgeInsets.all(1.0),
+                              child: Column(children: [
+                                TextFormField(
+                                  controller: searchContactController,
+                                  onChanged: (value) {
+                                    var c = contacts
+                                        .where((element) => element!
+                                            .displayName!
+                                            .toLowerCase()
+                                            .contains(value.toLowerCase()))
+                                        .toList();
+                                    setState(
+                                      () {
+                                        _contacts = c;
+                                      },
+                                    );
+                                  },
+                                  onTap: () {
+                                     setState(
+                                      () {
+                                        iskeyboardopen = true;
+                                      },
+                                    );
+                                  },
+                                  decoration: InputDecoration(
+                                    label: Text("Search contact"),
+                                  ),
                                 ),
-                              ),
-                              SingleChildScrollView(
-                                child: ListView.builder(
-                                    scrollDirection: Axis.vertical,
-                                    shrinkWrap: true,
-                                    itemCount: contacts.length,
-                                    itemBuilder: (BuildContext context, int i) {
-                                      return ListTile(
-                                        title: Text(contacts![i].displayName!),
-                                        subtitle: Text(contacts[i]
-                                            .phones![0]
-                                            .value!
-                                            .toString()),
-                                        onTap: () async {
-                                          var p = Person(
-                                            contacts![i].displayName!,
-                                            contacts[i]
-                                                .phones![0]
-                                                .value!
-                                                .toString(),
-                                            '0',
-                                            true,
-                                          );
-                                          if ((persons
-                                                  .firstWhere(
-                                                      (el) =>
-                                                          el.number == p.number,
-                                                      orElse: () => Person(
-                                                          "", "", "", true))
-                                                  .name ==
-                                              "")) {
-                                            DbHelper.db.inserTPersons(p);
-                                          } else {
-                                            var snackBar = SnackBar(
-                                                content: Text(
-                                                    'You already have history of transaction with this person'));
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(snackBar);
-                                          }
+                                Container(
+                                  height:MediaQuery.of(context).size.height / 3,
+                                      child: ListView.builder(
+                                          shrinkWrap: true,
+                                          scrollDirection: Axis.vertical,
+                                          itemCount: _contacts.length,
+                                          itemBuilder:
+                                              (BuildContext context, int i) {
+                                            return ListTile(
+                                              title: Text(
+                                                  _contacts![i].displayName!),
+                                              subtitle: Text(_contacts[i]
+                                                  .phones![0]
+                                                  .value!
+                                                  .toString()),
+                                              onTap: () async {
+                                                var p = Person(
+                                                  _contacts![i].displayName!,
+                                                  _contacts[i]
+                                                      .phones![0]
+                                                      .value!
+                                                      .toString(),
+                                                  '0',
+                                                  true,
+                                                );
+                                                if ((persons
+                                                        .firstWhere(
+                                                            (el) =>
+                                                                el.number ==
+                                                                p.number,
+                                                            orElse: () =>
+                                                                Person("", "",
+                                                                    "", true))
+                                                        .name ==
+                                                    "")) {
+                                                  DbHelper.db.inserTPersons(p);
+                                                } else {
+                                                  var snackBar = SnackBar(
+                                                      content: Text(
+                                                          'You already have history of transaction with this person'));
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(snackBar);
+                                                }
 
-                                          persons = await DbHelper.db
-                                              .retrievePersons();
-                                          setState(() {
-                                            this.persons = persons;
-                                          });
-                                        },
-                                      );
-                                    }),
-                              )
-                            ]))));
+                                                this.getPersons();
+                                                Navigator.pop(context);
+                                              },
+                                            );
+                                          })),
+                              ])));
+                    });
                   });
             }));
   }

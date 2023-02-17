@@ -270,7 +270,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
                                       return 'Please enter valid details';
                                     } else if (value.length < 5) {
                                       return 'minimun 5 letters required';
-                                    }else if (value.length>150){
+                                    } else if (value.length > 150) {
                                       return 'maximum 150 letters allowed';
                                     }
                                   } else {
@@ -301,6 +301,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
                               Row(
                                 children: [
                                   Checkbox(
+                                    checkColor: Color(0xFF1f1053),
                                       value: isPaidvalue,
                                       onChanged: (value) {
                                         if (value != null) {
@@ -308,10 +309,11 @@ class _TransactionsPageState extends State<TransactionsPage> {
                                             isPaidvalue = value;
                                           });
                                         }
-                                      }),
+                                      },),
                                   Text('Paid',
                                       style: TextStyle(fontSize: 12.0)),
                                   Checkbox(
+                                    checkColor: Color(0xFF1f1053),
                                       value: !isPaidvalue,
                                       onChanged: (value) {
                                         if (value != null) {
