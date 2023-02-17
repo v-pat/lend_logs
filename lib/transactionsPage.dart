@@ -61,12 +61,12 @@ class _TransactionsPageState extends State<TransactionsPage> {
               Text(this.contactNumber, style: TextStyle(fontSize: 14.0)),
             ],
           )),
-      body: Padding(
+      body: transactions.length>0?Padding(
           padding: EdgeInsets.all(4.0),
           child: Column(
             children: [
               Expanded(
-                child: ListView.builder(
+                child:ListView.builder(
                     scrollDirection: Axis.vertical,
                     shrinkWrap: true,
                     itemCount: transactions.length,
@@ -233,7 +233,16 @@ class _TransactionsPageState extends State<TransactionsPage> {
                     }),
               ),
             ],
-          )),
+          )):Center(
+        child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text("There are no transactions yet."),
+                          Text("Click on add button to new transaction",style: TextStyle(fontWeight: FontWeight.bold),)
+                        ],
+                      ),
+      ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Utils.colortheme,
         child: Icon(
@@ -378,5 +387,6 @@ class _TransactionsPageState extends State<TransactionsPage> {
         },
       ),
     );
+    
   }
 }

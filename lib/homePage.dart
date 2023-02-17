@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:lend_logs/aboutUs.dart';
 import 'package:lend_logs/dbHelper.dart';
 import 'package:lend_logs/models/person.dart';
 import 'package:lend_logs/transactionsPage.dart';
@@ -65,13 +66,26 @@ class _HomePageState extends State<HomePage> {
         key: _scaffoldKey,
         appBar: AppBar(
           leading: Image.asset('assets/images/logo_appbar.png'),
-          title: Text("Pay Logs"),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Pay Logs"),
+              IconButton(
+                tooltip: "About Us",
+                onPressed: (){
+                Navigator.of(context).push(new MaterialPageRoute(
+                              builder: (context) => new AboutUs()));
+              }, 
+              icon: Icon(Icons.info))
+            ]
+          ),
+          
         ),
         body: Padding(
           padding: EdgeInsets.all(4.0),
           child: Column(children: [
             Expanded(
-                child: ListView.builder(
+                child:persons.length>0? ListView.builder(
                     scrollDirection: Axis.vertical,
                     itemCount: persons.length,
                     itemBuilder: (BuildContext context, int i) {
@@ -127,7 +141,17 @@ class _HomePageState extends State<HomePage> {
                               }));
                         },
                       );
-                    }))
+                    }):
+                    Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text("There are no transaction logs yet."),
+                          Text("Click on add button to start transaction logs",style: TextStyle(fontWeight: FontWeight.bold),)
+                        ],
+                      ),
+                    ))
           ]),
         ),
         floatingActionButton: FloatingActionButton(
