@@ -62,7 +62,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(
+      child: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
           leading: Image.asset('assets/images/logo_appbar.png'),
@@ -260,6 +261,11 @@ class _HomePageState extends State<HomePage> {
                               ])));
                     });
                   });
-            }));
+            }))
+        , 
+      onWillPop: ()async{
+        return false;
+      }
+    );
   }
 }

@@ -20,7 +20,14 @@ class AboutUs extends StatelessWidget{
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-            Text("Developer Contact :"),
+            Text("Developed by :"),
+            Text('Vaibhav Pathak',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),),
+            SizedBox(height: 20.0,),
+            Text("Contact :"),
             Text('vpat.getinfo@gmail.com',
             style: TextStyle(
               fontWeight: FontWeight.bold,

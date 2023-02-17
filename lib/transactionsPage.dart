@@ -43,7 +43,8 @@ class _TransactionsPageState extends State<TransactionsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(
+    child: Scaffold(
       appBar: AppBar(
           leading: IconButton(
               icon: Icon(Icons.arrow_back),
@@ -386,7 +387,12 @@ class _TransactionsPageState extends State<TransactionsPage> {
           ).then((value) => {this.getinitialData()});
         },
       ),
+    ),
+    onWillPop: ()async{
+       Navigator.of(context).push(new MaterialPageRoute(
+                              builder: (context) => new HomePage()));
+        return false;
+      }
     );
-    
   }
 }
