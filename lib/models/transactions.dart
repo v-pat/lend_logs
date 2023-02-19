@@ -9,7 +9,7 @@ class Transactions{
   //if isPaid == true then on display we will show '-'
   // final bool isPaid;
 
-  static DateFormat dateFormat = DateFormat("dd-MM-yyyy hh:mm aa");
+  static DateFormat dateFormat = DateFormat("dd-MM-yyyy hh:mm:ss aa");
 
   Transactions(this.details,this.amount,this.date,
   // this.isPaid,
