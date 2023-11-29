@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "899619484226",
+    "project_id": "pay-logs-vpat",
+    "storage_bucket": "pay-logs-vpat.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:899619484226:android:270e7753ab99e1cbe2f3db",
+        "android_client_info": {
+          "package_name": "com.example.lend_logs"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCnXwPmDXTr3qB-W38UsisWHuXIHVcz3oU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

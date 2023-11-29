@@ -42,6 +42,7 @@ dependencies:
   intl:
   permission_handler:
   path:
+  firebase_core: ^2.23.0
 
   
 

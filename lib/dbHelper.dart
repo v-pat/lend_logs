@@ -86,7 +86,9 @@ class DbHelper{
   Future<List<Transactions>> retrieveTransactionsByPerson(int person_id) async {
     final Database db = await database;
     final List<Map<String, Object?>> queryResult = await db.rawQuery("SELECT * FROM "+transactionsTable+" WHERE " + "person_id" + " = " + person_id.toString(),null);
-    return queryResult.map((e) => Transactions.fromMap(e)).toList();
+    return queryResult.map((e) => 
+    Transactions.fromMap(e)
+    ).toList();
   }
 
   Future<List<Person>> retrievePersonById(int person_id) async {
@@ -97,6 +99,7 @@ class DbHelper{
 
   Future<int> insertTransaction(Transactions transactions) async {
     int result = 0;
+    print(transactions);
     final Database db = await database;
       result = await db.insert(transactionsTable, Transactions.toMap(transactions),
           conflictAlgorithm: ConflictAlgorithm.replace);
